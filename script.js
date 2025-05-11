@@ -1,25 +1,25 @@
-const video = document.querySelector('video');
-const progressRange = document.querySelector('.progress-range');
-const progressBar = document.querySelector('.progress-bar');
-const playBtn = document.getElementById('play-btn');
-const volumeIcon = document.getElementById('volume-icon');
-const volumeRange = document.querySelector('.volume-range');
-const volumeBar = document.querySelector('.volume-bar');
-const currentTime = document.querySelector('.time-elapsed');
-const duration = document.querySelector('.time-duration');
-const fullscreenBtn = document.querySelector('.fullscreen');
+const video = document.querySelector("video");
+const progressRange = document.querySelector(".progress-range");
+const progressBar = document.querySelector(".progress-bar");
+const playBtn = document.getElementById("play-btn");
+const volumeIcon = document.getElementById("volume-icon");
+const volumeRange = document.querySelector(".volume-range");
+const volumeBar = document.querySelector(".volume-bar");
+const currentTime = document.querySelector(".time-elapsed");
+const duration = document.querySelector(".time-duration");
+const fullscreenBtn = document.querySelector(".fullscreen");
 
 // Play & Pause ----------------------------------- //
 function showPlayIcon() {
-    playBtn.classList.replace('fa-pause', 'fa-play');
-    playBtn.setAttribute('title', 'Play Video');    
+    playBtn.classList.replace("fa-pause", "fa-play");
+    playBtn.setAttribute("title", "Play Video");
 }
 
 function togglePlay() {
     if (video.paused) {
         video.play();
-        playBtn.classList.replace('fa-play', 'fa-pause');
-        playBtn.setAttribute('title', 'Pause Video');
+        playBtn.classList.replace("fa-play", "fa-pause");
+        playBtn.setAttribute("title", "Pause Video");
     } else {
         video.pause();
         showPlayIcon();
@@ -27,7 +27,7 @@ function togglePlay() {
 }
 
 // On Video End, Show Play Button
-video.addEventListener('ended', showPlayIcon);
+video.addEventListener("ended", showPlayIcon);
 
 // Progress Bar ---------------------------------- //
 // Calculate display time format
@@ -53,6 +53,8 @@ function setProgress(e) {
 }
 
 // Volume Controls --------------------------- //
+let lastVolume = 1; // Store the last volume value
+
 // Volume Bar
 function changeVolume(e) {
     let volume = e.offsetX / volumeRange.offsetWidth;
@@ -67,26 +69,43 @@ function changeVolume(e) {
     video.volume = volume;
 
     // Change icon depending on volume
-    volumeIcon.className = '';
+    volumeIcon.className = "";
     if (volume > 0.7) {
-        volumeIcon.classList.add('fas', 'fa-volume-up');
+        volumeIcon.classList.add("fas", "fa-volume-up");
     } else if (volume < 0.7 && volume > 0) {
-        volumeIcon.classList.add('fas', 'fa-volume-down');
+        volumeIcon.classList.add("fas", "fa-volume-down");
     } else if (volume === 0) {
-        volumeIcon.classList.add('fas', 'fa-volume-off');
+        volumeIcon.classList.add("fas", "fa-volume-off");
+    }
+    lastVolume = volume; // Update last volume
+}
+
+// Mute/Unmute
+function toggleMute() {
+    volumeIcon.className = "";
+    if (video.volume) {
+        lastVolume = video.volume;
+        video.volume = 0;
+        volumeBar.style.width = 0;
+        volumeIcon.classList.add("fas", "fa-volume-mute");
+        volumeIcon.setAttribute("title", "Unmute");
+    } else {
+        video.volume = lastVolume;
+        volumeBar.style.width = `${lastVolume * 100}%`;
+        volumeIcon.classList.add("fas", "fa-volume-up");
+        volumeIcon.setAttribute("title", "Mute");
     }
 }
 
 // Change Playback Speed -------------------- //
 
-
-
 // Fullscreen ------------------------------- //
 
 // Event Listeners ------------------------------- //
-playBtn.addEventListener('click', togglePlay);
-video.addEventListener('click', togglePlay);
-video.addEventListener('timeupdate', updateProgress);
-video.addEventListener('canplay', updateProgress);
-progressRange.addEventListener('click', setProgress);
-volumeRange.addEventListener('click', changeVolume);
+playBtn.addEventListener("click", togglePlay);
+video.addEventListener("click", togglePlay);
+video.addEventListener("timeupdate", updateProgress);
+video.addEventListener("canplay", updateProgress);
+progressRange.addEventListener("click", setProgress);
+volumeRange.addEventListener("click", changeVolume);
+volumeIcon.addEventListener("click", toggleMute);
